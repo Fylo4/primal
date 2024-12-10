@@ -1,0 +1,10 @@
+<canvas id="gameCanvas" [width]="canvasWidth" [height]="canvasWidth/2" style="border: 1px solid black"></canvas>
+<!-- @for(card of allCards; track card) {
+    <app-card-render [card]="card"></app-card-render>
+} -->
+<div style="display: none">
+    @for (card of allCards; track card) {
+        <img [src]="card | NarrowestImg:200" [id]="card.cardNumber" [width]="200">
+    }
+    <img id="card-back" src="assets/primal-cards/card-back.png">
+</div>

@@ -1,0 +1,8 @@
+@if (display == 'image' && card.imageUrls?.length) {
+    <img [src]="card | NarrowestImg:width" [width]="width">
+}
+@else {
+    <div [style.width.px]="width" [style.height.px]="width * 7/5" style="border: 1px solid black; border-radius: 4px;">
+        <p class="ml-h mt-h">{{card.printedName}}</p>
+    </div>
+}

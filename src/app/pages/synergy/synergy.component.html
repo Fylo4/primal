@@ -1,0 +1,30 @@
+<h1>Synergy Explorer</h1>
+
+
+<div class="flex-row gap-h mb-h align-center">
+    <span>Name:</span>
+    <mat-form-field class="dense-2">
+        <mat-label>Name</mat-label>
+        <input matInput [(ngModel)]="cardName" [matAutocomplete]="nameAC">
+    </mat-form-field>
+</div>
+
+@if (selectedCard()) {
+    <app-card-render [card]="selectedCard()!" />
+}
+
+@for(syn of mySynergies(); track syn) {
+    <p><b>{{syn.text}}</b></p>
+    <div class="flex-row gap-h wrap">
+        @for (card of syn.cards; track card) {
+            <app-card-render [card]="card" />
+        }
+    </div>
+}
+
+
+<mat-autocomplete #nameAC="matAutocomplete">
+    @for (cardName of nameAutocomplete(); track cardName) {
+      <mat-option [value]="cardName">{{cardName}}</mat-option>
+    }
+</mat-autocomplete>

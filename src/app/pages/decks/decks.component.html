@@ -1,0 +1,90 @@
+<h1>Deck Builder</h1>
+@if (mode == 'all') {
+    <h2>My Decks:</h2>
+    @for (deck of allDecks; track deck) {
+        <p><b>{{deck.title}}</b> {{deck.description}}</p>
+    }
+    @if (allDecks.length == 0) {
+        <p>You don't currently have any saved decks. Press the button below to create one:</p>
+    }
+    <div class="flex-row gap-h align-center">
+        <button mat-mini-fab color="primary" type="button" (click)="createDeck()">+</button>
+        <span>New Deck</span>
+    </div>
+}
+@else if (mode == 'view') {
+
+}
+@else if (mode == 'edit') {
+    <mat-form-field class="dense-2 w-100 mb-h">
+        <mat-label>Title</mat-label>
+        <input matInput [(ngModel)]="allDecks[deckId].title">
+    </mat-form-field>
+    <mat-form-field class="dense-2 w-100">
+        <mat-label>Description</mat-label>
+        <textarea matInput [(ngModel)]="allDecks[deckId].description"></textarea>
+    </mat-form-field>
+    <h2>
+        Add Card:
+        <mat-form-field class="dense-2">
+            <mat-label>Card Name</mat-label>
+            <input matInput [(ngModel)]="cardName" [matAutocomplete]="nameAC">
+        </mat-form-field>
+    </h2>
+
+    @if (selectedCard()) {
+        <div class="flex-col">
+            <app-card-render [card]="selectedCard()!.card" />
+            <div class="flex-row">
+                <mat-form-field class="dense-2" style="width: 75px;">
+                    <mat-label>Main</mat-label>
+                    <input matInput [(ngModel)]="selectedCard()!.main" type="number" [min]="0" [max]="3">
+                </mat-form-field>
+                <mat-form-field class="dense-2" style="width: 75px;">
+                    <mat-label>Side</mat-label>
+                    <input matInput [(ngModel)]="selectedCard()!.side" type="number" [min]="0" [max]="3">
+                </mat-form-field>
+            </div>
+        </div>
+    }
+
+    <h2>Deck ({{allDecks[deckId].decklist?.length??0}}):</h2>
+    <div class="flex-row gap-h wrap">
+    @for (card of cardsWithCounts; track card) {
+        @for (copy of card.main | times; track copy) {
+            <div class="flex-col">
+                <app-card-render [card]="card.card" />
+                <div class="flex-row gap-h align-center">
+                    <button mat-mini-fab color="primary" type="button" (click)="changeMainCount(card, -1)" [disabled]="card.main <= 0">-</button>
+                    <span>{{card.main}}</span>
+                    <button mat-mini-fab color="primary" type="button" (click)="changeMainCount(card, 1)" [disabled]="card.main >= 3">+</button>
+                </div>
+            </div>
+        }
+    }
+    </div>
+
+    <h2>Side Deck ({{allDecks[deckId].sidedeck?.length??0}}):</h2>
+    <div class="flex-row gap-h wrap">
+    @for (card of cardsWithCounts; track card) {
+        @for (copy of card.side | times; track copy) {
+            <div class="flex-col">
+                <app-card-render [card]="card.card" />
+                <div class="flex-row gap-h align-center">
+                    <button mat-mini-fab color="primary" type="button" (click)="changeSideCount(card, -1)" [disabled]="card.side <= 0">-</button>
+                    <span>{{card.side}}</span>
+                    <button mat-mini-fab color="primary" type="button" (click)="changeSideCount(card, 1)" [disabled]="card.side >= 3">+</button>
+                </div>
+            </div>
+        }
+    }
+    </div>
+
+
+    <mat-autocomplete #nameAC="matAutocomplete">
+        @for (cardName of nameAutocomplete(); track cardName) {
+        <mat-option [value]="cardName">{{cardName}}</mat-option>
+        }
+    </mat-autocomplete>
+}
+

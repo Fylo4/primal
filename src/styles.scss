@@ -1,0 +1,757 @@
+// #region Theme Setup
+@use "@angular/material" as mat;
+@use "sass:map";
+@include mat.core();
+
+$site-primary: mat.m2-define-palette(mat.$m2-indigo-palette);
+$site-accent: mat.m2-define-palette(mat.$m2-pink-palette, A200, A100, A400);
+$site-warn: mat.m2-define-palette(mat.$m2-red-palette);
+$light-theme: mat.m2-define-light-theme(
+  (
+    color: (
+      primary: $site-primary,
+      accent: $site-accent,
+      warn: $site-warn,
+    ),
+  )
+);
+$dark-theme: mat.m2-define-light-theme(
+  (
+    color: (
+      primary: $site-primary,
+      accent: $site-accent,
+      warn: $site-warn,
+    ),
+  )
+);
+
+$dark-background: #303030;
+$dark-surface: rgb(66, 66, 66);
+// TODO: Only import themes you're using
+@include mat.all-component-themes($light-theme);
+
+.my-dark-theme {
+  @include mat.all-component-themes($dark-theme);
+}
+// #endregion
+
+// #region Basic page stuff
+html,
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+app-root {
+  display: flex;
+  flex-direction: column;
+}
+// #endregion
+
+// #region Color Palette Classes
+@mixin palette-mixin($base-set, $color-name) {
+  $steps: (
+    "-50": 50,
+    "-100": 100,
+    "-200": 200,
+    "-300": 300,
+    "-400": 400,
+    "-500": 500,
+    "-600": 600,
+    "-700": 700,
+    "-800": 800,
+    "-900": 900,
+    "": 500,
+  );
+
+  @each $lev-selector, $lev in $steps {
+    .bg-#{$color-name}#{$lev-selector} {
+      background-color: mat.m2-get-color-from-palette($base-set, $lev) !important;
+    }
+    .color-#{$color-name}#{$lev-selector} {
+      color: mat.m2-get-color-from-palette($base-set, $lev) !important;
+    }
+    .border-#{$color-name}#{$lev-selector} {
+      border-color: mat.m2-get-color-from-palette($base-set, $lev) !important;
+    }
+  }
+}
+
+// Craft the primary and warn set of colors
+@include palette-mixin($site-primary, "primary");
+@include palette-mixin($site-accent, "accent");
+@include palette-mixin($site-warn, "warn");
+// #endregion
+
+// #region Margin/Padding Helpers
+@mixin spacing-helper() {
+  $sizes: (
+    "-0": 0,
+    "-q": 0.25rem,
+    "-h": 0.5rem,
+    "-hq": 0.75rem,
+    "": 1rem,
+    "-1": 1rem,
+    "-1h": 1.5rem,
+    "-2": 2rem,
+    "-2h": 2.5rem,
+    "-3": 3rem,
+    "-a": auto,
+  );
+  $sides: (
+    "t": "-top",
+    "b": "-bottom",
+    "l": "-left",
+    "r": "-right",
+    "": "",
+  );
+  $classes: (
+    "m": "margin",
+    "p": "padding",
+  );
+
+  @each $className, $class in $classes {
+    @each $sideName, $side in $sides {
+      @each $sizeName, $size in $sizes {
+        .#{$className}#{$sideName}#{$sizeName} {
+          #{$class}#{$side}: #{$size} !important;
+        }
+      }
+    }
+  }
+}
+@include spacing-helper();
+// #endregion
+
+//#region Philip's table styles
+//table.striped-hover-table highlights table rows on hover, and provides a zebra stripe pattern
+//Use .override-odd or .override-even on <tr> to force the style
+//Use <thead>, <tbody>, and <tfoot> and everything should format automatically
+//Otherwise you can use .header-row, .body-row, and .footer-row on <tr>'s
+
+.striped-hover-table {
+  border-collapse: collapse;
+  * {
+    box-sizing: content-box;
+    padding: 0;
+  }
+  .header-row,
+  thead tr {
+    > * {
+      padding-top: 8px;
+      padding-bottom: 8px;
+    }
+  }
+  tr > :first-child {
+    padding-left: 16px;
+  }
+  tr,
+  caption {
+    transition: background-color 0.25s;
+  }
+  caption {
+    text-align: left;
+    font-size: 1.25rem;
+    padding: 8px 0 0 16px;
+  }
+}
+@mixin generate-striped-hover-table(
+  $color-1,
+  $color-2,
+  $base,
+  $odd-color,
+  $shademap
+) {
+  .header-row,
+  thead tr,
+  caption {
+    // Header / Caption
+    background-color: mix(
+      $color-1,
+      $base,
+      map.get($shademap, "header")
+    ) !important;
+  }
+
+  tbody tr:nth-child(even):not(.override-odd):not(.highlight-row):not(.red-row),
+  tr.body-row:nth-child(even):not(.override-odd):not(.highlight-row):not(
+      .red-row
+    ),
+  tr.override-even {
+    // Even (standard)
+    background-color: mix(
+      $color-1,
+      $base,
+      map.get($shademap, "even-s")
+    ) !important;
+  }
+  tbody
+    tr:nth-child(even):not(.override-odd):not(.red-row):not(
+      .highlight-row
+    ):hover,
+  tr.body-row:nth-child(even):not(.override-odd):not(.red-row):not(
+      .highlight-row
+    ):hover,
+  tr.override-even:hover {
+    // Even (hover)
+    background-color: mix(
+      $color-1,
+      $base,
+      map.get($shademap, "even-h")
+    ) !important;
+  }
+  tbody tr:nth-child(odd):not(.override-even):not(.red-row):not(.highlight-row),
+  tr.body-row:nth-child(odd):not(.override-even):not(.red-row):not(
+      .highlight-row
+    ),
+  tr.override-odd {
+    // Odd (standard)
+    background-color: mix(
+      $odd-color,
+      $base,
+      map.get($shademap, "odd-s")
+    ) !important;
+  }
+  tbody
+    tr:nth-child(odd):not(.override-even):not(.red-row):not(
+      .highlight-row
+    ):hover,
+  tr.body-row:nth-child(odd):not(.override-even):not(.red-row):not(
+      .highlight-row
+    ):hover,
+  tr.override-odd:hover {
+    // Odd (hover)
+    background-color: mix(
+      $odd-color,
+      $base,
+      map.get($shademap, "odd-h")
+    ) !important;
+  }
+  .highlight-row:nth-child(even) {
+    background-color: mix(
+      $color-2,
+      $base,
+      map.get($shademap, "highlight-es")
+    ) !important;
+  }
+  .highlight-row:nth-child(even):hover {
+    background-color: mix(
+      $color-2,
+      $base,
+      map.get($shademap, "highlight-eh")
+    ) !important;
+  }
+  .highlight-row:nth-child(odd) {
+    background-color: mix(
+      $color-2,
+      $base,
+      map.get($shademap, "highlight-os")
+    ) !important;
+  }
+  .highlight-row:nth-child(odd):hover {
+    background-color: mix(
+      $color-2,
+      $base,
+      map.get($shademap, "highlight-oh")
+    ) !important;
+  }
+  .footer-row,
+  tfoot tr {
+    background-color: mix(
+      $color-2,
+      $base,
+      map.get($shademap, "footer-s")
+    ) !important;
+  }
+  .footer-row:hover,
+  tfoot tr:hover {
+    background-color: mix(
+      $color-2,
+      $base,
+      map.get($shademap, "footer-h")
+    ) !important;
+  }
+}
+$light-shademap: (
+  "header": 100%,
+  "even-s": 40%,
+  "even-h": 60%,
+  "odd-s": 0%,
+  "odd-h": 10%,
+  "highlight-es": 55%,
+  "highlight-eh": 70%,
+  "highlight-os": 20%,
+  "highlight-oh": 35%,
+  "footer-s": 70%,
+  "footer-h": 90%,
+);
+$dark-shademap: (
+  "header": 70%,
+  "even-s": 35%,
+  "even-h": 50%,
+  "odd-s": 0%,
+  "odd-h": 10%,
+  "highlight-es": 55%,
+  "highlight-eh": 70%,
+  "highlight-os": 20%,
+  "highlight-oh": 35%,
+  "footer-s": 70%,
+  "footer-h": 90%,
+);
+.striped-hover-table:not(.table-accent) {
+  @include generate-striped-hover-table(
+    // Main colors
+    mat.m2-get-color-from-palette($site-primary, 500),
+    mat.m2-get-color-from-palette($site-accent, 500),
+    // Base colors
+    white,
+    black,
+    $light-shademap
+  );
+}
+.striped-hover-table.table-accent {
+  @include generate-striped-hover-table(
+    // Main colors
+    mat.m2-get-color-from-palette($site-accent, 500),
+    mat.m2-get-color-from-palette($site-primary, 500),
+    // Base colors
+    white,
+    black,
+    $light-shademap
+  );
+}
+.my-dark-theme {
+  .striped-hover-table:not(.table-accent) {
+    @include generate-striped-hover-table(
+      // Main colors
+      mat.m2-get-color-from-palette($site-primary, 500),
+      mat.m2-get-color-from-palette($site-accent, 500),
+      // Base colors
+      $dark-surface,
+      white,
+      $dark-shademap
+    );
+  }
+  .striped-hover-table.table-accent {
+    @include generate-striped-hover-table(
+      // Main colors
+      mat.m2-get-color-from-palette($site-accent, 500),
+      mat.m2-get-color-from-palette($site-primary, 500),
+      // Base colors
+      $dark-surface,
+      white,
+      $dark-shademap
+    );
+  }
+}
+
+.pad-cells td,
+.pad-cells th {
+  padding: 0.5rem;
+}
+.table-stroke {
+  border: 1px solid black;
+  td,
+  th,
+  caption {
+    border: 1px solid black;
+  }
+  caption {
+    border-bottom: 0;
+  }
+}
+
+//This table can automatically be broken into 2-column or 1-column mode
+//Give the table .breakable-table, then optionally .one-col or .two-col
+//Give table .show-prefix to start cells with their data-cell attribute
+//Ensure you always include <thead>, <tbody>, and <tfoot> as applicable
+.breakable-table {
+  border-collapse: collapse;
+  * {
+    box-sizing: content-box;
+    padding: 0;
+  }
+  .header-row,
+  thead tr {
+    > * {
+      padding-top: 8px;
+      padding-bottom: 8px;
+    }
+  }
+
+  th,
+  td {
+    text-align: left;
+  }
+
+  .body-row th,
+  tbody > tr th {
+    font-weight: normal;
+  }
+  tr {
+    > :first-child {
+      padding-left: 16px;
+    }
+    > :last-child {
+      padding-right: 16px;
+    }
+  }
+  caption {
+    text-align: left;
+    font-size: 1.25rem;
+    padding: 8px 0 0 16px;
+  }
+  mat-form-field {
+    box-sizing: border-box;
+    max-width: 100%;
+  }
+}
+
+@media print {
+  .breakable-table * {
+    overflow: visible;
+  }
+}
+//One-column and two-column modes revert to full width when printing
+@media not print {
+  .breakable-table.one-col {
+    thead {
+      display: none;
+    }
+    td,
+    th {
+      display: block;
+      padding-left: 16px;
+      padding-right: 16px;
+    }
+    tr {
+      > :first-child {
+        padding-top: 8px;
+      }
+      > :last-child {
+        padding-bottom: 8px;
+      }
+    }
+    caption {
+      padding-top: 16px;
+      padding-bottom: 16px;
+    }
+  }
+
+  .breakable-table.two-col {
+    thead {
+      display: none;
+    }
+    tr {
+      display: flex;
+      flex-wrap: wrap;
+    }
+    td,
+    th {
+      display: block;
+      padding-right: 0 !important;
+    }
+    td:nth-child(odd),
+    th:nth-child(odd) {
+      padding-left: 16px;
+    }
+    tr {
+      > :first-child,
+      > :nth-child(2) {
+        padding-top: 8px;
+      }
+      > :last-child {
+        padding-bottom: 8px;
+      }
+    }
+    caption {
+      padding-top: 16px;
+      padding-bottom: 16px;
+    }
+  }
+
+  .breakable-table.show-prefix {
+    td::before,
+    th::before {
+      content: attr(data-cell) ": ";
+      font-weight: bold !important;
+    }
+  }
+}
+
+.red-row {
+  background-color: rgb(255, 206, 206) !important;
+}
+.striped-hover-table .red-row:hover {
+  background-color: rgb(255, 177, 177) !important;
+}
+.my-dark-theme {
+  .red-row {
+    background-color: rgb(109, 72, 72) !important;
+  }
+}
+//#endregion
+
+// #region Bordered Buttons
+// Make button focus more visible, helps with accessibility
+// Focus is used, instead of just focus-visible, for browser compatability
+// (IE and some others don't support focus-visible)
+button.focus-border:focus {
+  border: 3px solid red;
+}
+button.focus-border[color="warn"]:focus {
+  border: 3px solid blue;
+}
+// By default, make an invisible border - prevents buttons from moving around on focus
+button.focus-border:focus:not(:focus-visible),
+button.focus-border:not(:focus) {
+  border: 3px solid rgba(0, 0, 0, 0);
+}
+.focus-border-all-buttons {
+  button {
+    @extend .focus-border;
+  }
+}
+// #endregion
+
+// #region Text size responsivity
+//Allow user to change font size with browser settings
+//Text
+p,
+li,
+label,
+span,
+th,
+td {
+  font-size: 1rem !important;
+}
+h1 {
+  font-size: 2rem !important;
+}
+h2 {
+  font-size: 1.5rem !important;
+}
+h3 {
+  font-size: 1.17rem !important;
+}
+h4 {
+  font-size: 1rem !important;
+}
+h5 {
+  font-size: 0.83rem !important;
+}
+h6 {
+  font-size: 0.67rem !important;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+span,
+th,
+td {
+  line-height: 1.2 !important;
+}
+
+//Buttons
+.mdc-button {
+  height: unset !important;
+  padding: 0.5rem 1rem !important;
+}
+.dense-1 .mdc-button,
+.dense-1.mdc-button {
+  padding: 0.4rem 0.75rem !important;
+}
+.dense-2 .mdc-button,
+.dense-2.mdc-button {
+  padding: 0.25rem 0.5rem !important;
+}
+.dense-3 .mdc-button,
+.dense-3.mdc-button {
+  padding: 0.1rem 0.25rem !important;
+}
+.dense-4 .mdc-button,
+.dense-4.mdc-button {
+  padding: 0 0 !important;
+}
+
+//Form fields
+.mat-mdc-form-field-infix {
+  min-height: unset !important;
+}
+
+.mat-mdc-text-field-wrapper:not(.mdc-text-field--outlined)
+  .mat-mdc-form-field-infix {
+  padding-top: 1.5rem;
+  padding-bottom: 0.5rem;
+}
+.mat-mdc-text-field-wrapper.mdc-text-field--outlined .mat-mdc-form-field-infix {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+.dense-1
+  .mat-mdc-text-field-wrapper:not(.mdc-text-field--outlined)
+  .mat-mdc-form-field-infix {
+  padding-top: 1.375rem;
+  padding-bottom: 0.375rem;
+}
+.dense-1
+  .mat-mdc-text-field-wrapper.mdc-text-field--outlined
+  .mat-mdc-form-field-infix {
+  padding-top: 0.875rem;
+  padding-bottom: 0.875rem;
+}
+.dense-2
+  .mat-mdc-text-field-wrapper:not(.mdc-text-field--outlined)
+  .mat-mdc-form-field-infix,
+.dense-2
+  .mat-mdc-text-field-wrapper.mdc-text-field--outlined
+  .mat-mdc-form-field-infix {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+.dense-3
+  .mat-mdc-text-field-wrapper:not(.mdc-text-field--outlined)
+  .mat-mdc-form-field-infix,
+.dense-3
+  .mat-mdc-text-field-wrapper.mdc-text-field--outlined
+  .mat-mdc-form-field-infix {
+  padding-top: 0.625rem;
+  padding-bottom: 0.625rem;
+}
+
+mat-form-field input {
+  // height: 1.5rem !important;
+  font-size: 1rem !important;
+}
+
+.mdc-floating-label {
+  transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1),
+    color 150ms cubic-bezier(0.4, 0, 0.2, 1),
+    top 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mdc-floating-label:not(.mdc-floating-label--float-above) {
+  top: 1.75rem !important;
+}
+.dense-1 .mdc-floating-label:not(.mdc-floating-label--float-above) {
+  top: 1.625rem !important;
+}
+.dense-2 .mdc-floating-label:not(.mdc-floating-label--float-above) {
+  top: 1.5rem !important;
+}
+.dense-3 .mdc-floating-label:not(.mdc-floating-label--float-above) {
+  top: 1.375rem !important;
+}
+
+// Radio buttons - Not sure if this actually works
+.mdc-radio__background {
+  top: calc(22px - max(1em, 22px));
+}
+.mdc-floating-label {
+  top: calc(1rem + 10px) !important;
+}
+
+// #endregion
+
+// #region Print Styling
+@media screen {
+  .only-print {
+    display: none;
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
+// #endregion
+
+// #region Utilities
+[hidden],
+.hidden {
+  display: none !important;
+}
+
+.dense-1 {
+  @include mat.all-component-densities(-1);
+}
+.dense-2 {
+  @include mat.all-component-densities(-2);
+}
+.dense-3 {
+  @include mat.all-component-densities(-3);
+}
+mat-form-field.width-unset .mat-mdc-form-field-infix {
+  width: unset !important;
+}
+
+.w-100 {
+  width: 100%;
+}
+.w-max {
+  width: max-content;
+}
+.w-min {
+  width: min-content;
+}
+.h-100 {
+  height: 100%;
+}
+.h-max {
+  height: max-content;
+}
+.h-min {
+  height: min-content;
+}
+.flex {
+  display: flex !important;
+}
+.flex-row {
+  display: flex !important;
+  flex-direction: row;
+}
+.flex-col {
+  display: flex !important;
+  flex-direction: column;
+}
+.inline {
+  display: inline;
+}
+.flex-1 {
+  flex: 1 0 0;
+}
+.wrap {
+  flex-wrap: wrap;
+}
+.gap-h {
+  gap: 0.5rem 0.5rem;
+}
+.gap-1 {
+  gap: 1rem 1rem;
+}
+.justify-even {
+  justify-content: space-evenly;
+}
+.justify-between {
+  justify-content: space-between;
+}
+.justify-center {
+  justify-content: center;
+}
+.align-center {
+  align-content: center;
+  align-items: center;
+}
+.bold {
+  font-weight: bold !important;
+}
+// #endregion

@@ -1,0 +1,19 @@
+<div class="h-100 flex-col" style="height: 100vh;">
+  <mat-toolbar color="primary" style="flex: 0 0 64px;">
+    <span>Primal</span>
+    <div class="ml-a mr-a">
+      <div class="flex-row gap-h">
+        <button mat-raised-button type="button" [routerLink]="'cards'">Card Search</button>
+        <button mat-raised-button type="button" [routerLink]="'synergy'">Synergies</button>
+        <button mat-raised-button type="button" [routerLink]="'decks'">Deck Builder</button>
+        <button mat-raised-button type="button" [routerLink]="'play'">Play</button>
+      </div>
+    </div>
+  </mat-toolbar>
+
+  <div style="flex: 1 0 auto; background-color: rgb(220, 220, 220); overflow: hidden;" class="w-100 flex-row justify-center">
+    <div style="width: 75%; background-color: white; border: 1px solid grey; border-top: 0px;" class="p-1">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>

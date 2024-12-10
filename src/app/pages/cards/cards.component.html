@@ -1,0 +1,72 @@
+<h1>Primal Cards Explorer</h1>
+<mat-expansion-panel class="mb">
+    <mat-expansion-panel-header>
+        Filters
+    </mat-expansion-panel-header>
+    <div class="flex-row gap-h mb-h align-center">
+        <span>Name:</span>
+        <mat-form-field class="dense-2">
+            <mat-label>Name</mat-label>
+            <input matInput [(ngModel)]="cardName" [matAutocomplete]="nameAC">
+        </mat-form-field>
+    </div>
+    <div class="flex-row gap-h mb-h align-center">
+        <span>Type:</span>
+        <mat-form-field class="dense-2">
+            <mat-label>Type</mat-label>
+            <mat-select multiple [(ngModel)]="selectedTypes">
+                @for (type of cardTypes; track type) {
+                    <mat-option [value]="type.value">{{type.value}} ({{type.count}})</mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+    </div>
+    <div class="flex-row gap-h mb-h align-center">
+        <span>Element:</span>
+        <mat-form-field class="dense-2">
+            <mat-label>Element</mat-label>
+            <mat-select multiple [(ngModel)]="selectedElems">
+                @for (x of cardElems; track x) {
+                    <mat-option [value]="x.value">{{x.value}} ({{x.count}})</mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+    </div>
+    <div class="flex-row gap-h mb-h align-center">
+        <span>Rarity:</span>
+        <mat-form-field class="dense-2">
+            <mat-label>Rarity</mat-label>
+            <mat-select multiple [(ngModel)]="selectedRarities">
+                @for (x of cardRarities; track x) {
+                    <mat-option [value]="x.value">{{x.value}} ({{x.count}})</mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+    </div>
+    <div class="flex-row gap-h mb-h align-center">
+        <span>Set:</span>
+        <mat-form-field class="dense-2">
+            <mat-label>Set</mat-label>
+            <mat-select multiple [(ngModel)]="selectedSets">
+                @for (x of cardSets; track x) {
+                    <mat-option [value]="x.value">{{x.value}} ({{x.count}})</mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+    </div>
+
+</mat-expansion-panel>
+
+<p>{{filteredCards().length}} of {{cards.length}} filtered</p>
+
+<div class="flex-row gap-h wrap">
+@for(card of filteredCards(); track card) {
+    <app-card-render [card]="card" />
+}
+</div>
+
+<mat-autocomplete #nameAC="matAutocomplete">
+    @for (cardName of nameAutocomplete(); track cardName) {
+      <mat-option [value]="cardName">{{cardName}}</mat-option>
+    }
+</mat-autocomplete>
